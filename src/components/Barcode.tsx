@@ -49,10 +49,8 @@ export function Barcode({
         const generateBarcode = async () => {
             if (containerRef.current) {
                 try {
-                    // Nettoyer le conteneur
                     containerRef.current.innerHTML = '';
 
-                    // Créer le SVG
                     const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
                     containerRef.current.appendChild(svg);
 

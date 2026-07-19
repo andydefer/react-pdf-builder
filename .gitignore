@@ -5,6 +5,7 @@ yarn.lock
 
 # Build output
 dist/
+prompts/
 *.tsbuildinfo
 
 # Environment
@@ -32,4 +33,4 @@ yarn-error.log*
 temp/
 *.tmpdist/
 examples/
-docs/
+docs/diffs/
