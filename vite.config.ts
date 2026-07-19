@@ -6,22 +6,23 @@ export default defineConfig({
     plugins: [
         dts({
             insertTypesEntry: true,
-            include: ['src/**/*.ts'],
+            include: ['src/**/*.ts', 'src/**/*.tsx'],
         }),
     ],
     build: {
         lib: {
             entry: resolve(__dirname, 'src/index.ts'),
-            name: 'InvoicePDF',
+            name: 'ReactPDFBuilder',
             fileName: (format) => `index.${format}.js`,
             formats: ['es', 'umd']
         },
         rollupOptions: {
-            external: ['html2canvas', 'jspdf'],
+            external: ['react', 'tailwindcss', 'html2canvas', 'jspdf'],
             output: {
                 globals: {
-                    html2canvas: 'html2canvas',
-                    jspdf: 'jspdf'
+                    react: 'React',
+                    'html2canvas': 'html2canvas',
+                    'jspdf': 'jspdf'
                 }
             }
         }

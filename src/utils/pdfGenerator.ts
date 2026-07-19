@@ -1,6 +1,14 @@
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
-import { PDFOptions } from '../types';
+
+export interface PDFOptions {
+    filename?: string;
+    scale?: number;
+    backgroundColor?: string;
+    margin?: number;
+    format?: 'a4' | 'a3' | 'letter' | 'legal' | number[];
+    orientation?: 'portrait' | 'landscape';
+}
 
 export class PDFGenerator {
     private container: HTMLDivElement | null = null;
@@ -10,7 +18,7 @@ export class PDFGenerator {
         options: PDFOptions = {}
     ): Promise<jsPDF> {
         const {
-            filename = 'invoice.pdf',
+            filename = 'document.pdf',
             scale = 2,
             backgroundColor = '#ffffff',
             margin = 10,
