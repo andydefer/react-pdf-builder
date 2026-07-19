@@ -1,14 +1,6 @@
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
-
-export interface PDFOptions {
-    filename?: string;
-    scale?: number;
-    backgroundColor?: string;
-    margin?: number;
-    format?: 'a4' | 'a3' | 'letter' | 'legal' | number[];
-    orientation?: 'portrait' | 'landscape';
-}
+import { PDFOptions } from '../types/pdf';
 
 export class PDFGenerator {
 
@@ -17,11 +9,12 @@ export class PDFGenerator {
         options: PDFOptions = {}
     ): Promise<jsPDF> {
         const {
-            scale = 2,
+            scale = 1.5,
             backgroundColor = '#ffffff',
             margin = 10,
             format = 'a4',
-            orientation = 'portrait'
+            orientation = 'portrait',
+            quality = 0.4
         } = options;
 
         const tempContainer = document.createElement('div');
@@ -54,7 +47,8 @@ export class PDFGenerator {
             const pdf = new jsPDF({
                 orientation: orientation,
                 unit: 'mm',
-                format: format
+                format: format,
+                compress: true, // Activer la compression
             });
 
             const pdfWidth = pdf.internal.pageSize.getWidth();
@@ -62,7 +56,8 @@ export class PDFGenerator {
             const usableWidth = pdfWidth - (margin * 2);
             const usableHeight = pdfHeight - (margin * 2);
 
-            const imgData = canvas.toDataURL('image/png');
+            // Convertir en JPEG avec qualité réduite pour réduire le poids
+            const imgData = canvas.toDataURL('image/jpeg', quality);
             const imgWidth = usableWidth;
             const imgHeight = (canvas.height * imgWidth) / canvas.width;
 
@@ -70,10 +65,10 @@ export class PDFGenerator {
                 const ratio = usableHeight / imgHeight;
                 const newWidth = imgWidth * ratio;
                 const xOffset = margin + (usableWidth - newWidth) / 2;
-                pdf.addImage(imgData, 'PNG', xOffset, margin, newWidth, usableHeight);
+                pdf.addImage(imgData, 'JPEG', xOffset, margin, newWidth, usableHeight);
             } else {
                 const yOffset = margin + (usableHeight - imgHeight) / 2;
-                pdf.addImage(imgData, 'PNG', margin, yOffset, imgWidth, imgHeight);
+                pdf.addImage(imgData, 'JPEG', margin, yOffset, imgWidth, imgHeight);
             }
 
             return pdf;
@@ -84,41 +79,14 @@ export class PDFGenerator {
         }
     }
 
-    async generateMultiplePages(
-        elements: HTMLElement[],
-        options: PDFOptions = {}
-    ): Promise<jsPDF[]> {
-        const {
-            scale = 2,
-            margin = 10,
-            backgroundColor = '#ffffff',
-            format = 'a4',
-            orientation = 'portrait'
-        } = options;
-
-        const pdfs: jsPDF[] = [];
-
-        for (let i = 0; i < elements.length; i++) {
-            const pdf = await this.generatePage(elements[i], {
-                format,
-                orientation,
-                scale,
-                margin,
-                backgroundColor,
-            });
-            pdfs.push(pdf);
-        }
-
-        return pdfs;
-    }
-
     async toBase64(
         htmlContent: string,
         options: PDFOptions = {}
     ): Promise<string> {
         const {
-            scale = 2,
-            backgroundColor = '#ffffff'
+            scale = 1.5,
+            backgroundColor = '#ffffff',
+            quality = 0.8
         } = options;
 
         const container = document.createElement('div');
@@ -147,7 +115,7 @@ export class PDFGenerator {
             });
 
             document.body.removeChild(container);
-            return canvas.toDataURL('image/png');
+            return canvas.toDataURL('image/jpeg', quality);
         } catch (error) {
             document.body.removeChild(container);
             throw new Error(`Base64 conversion failed: ${error}`);

@@ -5,6 +5,7 @@ export interface PDFConfig {
     margin: number;
 }
 
+
 export interface PDFOptions {
     filename?: string;
     scale?: number;
@@ -12,6 +13,7 @@ export interface PDFOptions {
     margin?: number;
     format?: 'a4' | 'a3' | 'letter' | 'legal' | number[];
     orientation?: 'portrait' | 'landscape';
+    quality?: number; // 0.1 à 1.0
 }
 
 export interface PDFGeneratorRef {

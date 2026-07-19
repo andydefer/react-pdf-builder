@@ -1,6 +1,6 @@
 import { usePDFContext } from '../context';
+import { PDFOptions } from '../types/pdf';
 import { PDFGenerator as PDFGeneratorClass } from '../utils/pdfGenerator';
-import { PDFOptions } from '../types';
 
 export function usePDF() {
     const { config, setConfig, loading, setLoading, error, setError } = usePDFContext();
@@ -17,8 +17,9 @@ export function usePDF() {
             const html = element.outerHTML;
 
             const base64 = await generator.toBase64(html, {
-                scale: options?.scale || config.scale,
+                scale: options?.scale || 1.5,
                 backgroundColor: options?.backgroundColor || '#ffffff',
+                quality: options?.quality || 0.8,
             });
 
             setLoading(false);
@@ -42,11 +43,9 @@ export function usePDF() {
             const generator = new PDFGeneratorClass();
             const elementsArray = Array.isArray(elements) ? elements : [elements];
 
-            // Récupérer TOUTES les Pages avec data-page-id
             const pages: HTMLElement[] = [];
 
             for (const el of elementsArray) {
-                // Chercher tous les éléments avec data-page-id (les Pages)
                 const pageElements = el.querySelectorAll('[data-page-id]');
 
                 if (pageElements.length > 0) {
@@ -54,7 +53,6 @@ export function usePDF() {
                         pages.push(page as HTMLElement);
                     });
                 } else {
-                    // Si pas de Page, ajouter l'élément lui-même
                     pages.push(el);
                 }
             }
@@ -63,16 +61,16 @@ export function usePDF() {
                 throw new Error('No pages found to generate PDF');
             }
 
-            // Générer UN PDF par Page
             const baseFilename = options?.filename?.replace('.pdf', '') || 'document';
 
             for (let i = 0; i < pages.length; i++) {
                 const pdf = await generator.generatePage(pages[i], {
                     format: options?.format || config.format,
                     orientation: options?.orientation || config.orientation,
-                    scale: options?.scale || config.scale,
+                    scale: options?.scale || 1.5,
                     margin: options?.margin || config.margin,
                     backgroundColor: options?.backgroundColor || '#ffffff',
+                    quality: options?.quality || 0.8,
                 });
 
                 const filename = pages.length === 1

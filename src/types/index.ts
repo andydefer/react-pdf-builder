@@ -34,15 +34,6 @@ export interface InvoiceData {
     tax: number;
 }
 
-export interface PDFOptions {
-    filename?: string;
-    scale?: number;
-    backgroundColor?: string;
-    margin?: number;
-    format?: 'a4' | 'a3' | 'letter' | 'legal' | number[];
-    orientation?: 'portrait' | 'landscape';
-}
-
 export interface TemplateOptions {
     showLogo?: boolean;
     showPaymentInfo?: boolean;
