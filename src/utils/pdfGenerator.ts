@@ -1,5 +1,6 @@
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
+import { PDFDocument } from 'pdf-lib';
 import { PDFOptions } from '../types/pdf';
 
 export class PDFGenerator {
@@ -7,14 +8,14 @@ export class PDFGenerator {
     async generatePage(
         element: HTMLElement,
         options: PDFOptions = {}
-    ): Promise<jsPDF> {
+    ): Promise<ArrayBuffer> {
         const {
             scale = 1.5,
             backgroundColor = '#ffffff',
             margin = 10,
             format = 'a4',
             orientation = 'portrait',
-            quality = 0.4
+            quality = 0.8
         } = options;
 
         const tempContainer = document.createElement('div');
@@ -48,7 +49,7 @@ export class PDFGenerator {
                 orientation: orientation,
                 unit: 'mm',
                 format: format,
-                compress: true, // Activer la compression
+                compress: true,
             });
 
             const pdfWidth = pdf.internal.pageSize.getWidth();
@@ -56,7 +57,6 @@ export class PDFGenerator {
             const usableWidth = pdfWidth - (margin * 2);
             const usableHeight = pdfHeight - (margin * 2);
 
-            // Convertir en JPEG avec qualité réduite pour réduire le poids
             const imgData = canvas.toDataURL('image/jpeg', quality);
             const imgWidth = usableWidth;
             const imgHeight = (canvas.height * imgWidth) / canvas.width;
@@ -71,11 +71,65 @@ export class PDFGenerator {
                 pdf.addImage(imgData, 'JPEG', margin, yOffset, imgWidth, imgHeight);
             }
 
-            return pdf;
+            // Retourner le PDF en ArrayBuffer
+            return pdf.output('arraybuffer');
 
         } catch (error) {
             document.body.removeChild(tempContainer);
             throw new Error(`PDF generation failed: ${error}`);
+        }
+    }
+
+    async generateMultiplePages(
+        elements: HTMLElement[],
+        options: PDFOptions = {}
+    ): Promise<ArrayBuffer> {
+        const {
+            format = 'a4',
+            orientation = 'portrait',
+            scale = 1.5,
+            margin = 10,
+            backgroundColor = '#ffffff',
+            quality = 0.8
+        } = options;
+
+        // Générer chaque page individuellement et stocker les ArrayBuffers
+        const pdfBuffers: ArrayBuffer[] = [];
+
+        for (const element of elements) {
+            const buffer = await this.generatePage(element, {
+                format,
+                orientation,
+                scale,
+                margin,
+                backgroundColor,
+                quality,
+            });
+            pdfBuffers.push(buffer);
+        }
+
+        // Si une seule page, la retourner directement
+        if (pdfBuffers.length === 1) {
+            return pdfBuffers[0];
+        }
+
+        // Fusionner tous les PDFs en un seul
+        return await this.mergePDFs(pdfBuffers);
+    }
+
+    async mergePDFs(pdfFiles: ArrayBuffer[]): Promise<ArrayBuffer> {
+        try {
+            const mergedPdf = await PDFDocument.create();
+
+            for (const pdfFile of pdfFiles) {
+                const pdf = await PDFDocument.load(pdfFile);
+                const pages = await mergedPdf.copyPages(pdf, pdf.getPageIndices());
+                pages.forEach((page) => mergedPdf.addPage(page));
+            }
+
+            return await mergedPdf.save();
+        } catch (error) {
+            throw new Error(`PDF merge failed: ${error}`);
         }
     }
 
@@ -120,5 +174,27 @@ export class PDFGenerator {
             document.body.removeChild(container);
             throw new Error(`Base64 conversion failed: ${error}`);
         }
+    }
+
+    async downloadMultiplePages(
+        elements: HTMLElement[],
+        options: PDFOptions = {}
+    ): Promise<void> {
+        const {
+            filename = 'document.pdf',
+        } = options;
+
+        const buffer = await this.generateMultiplePages(elements, options);
+
+        // Créer un blob et télécharger
+        const blob = new Blob([buffer], { type: 'application/pdf' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
     }
 }

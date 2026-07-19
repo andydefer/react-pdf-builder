@@ -43,6 +43,7 @@ export function usePDF() {
             const generator = new PDFGeneratorClass();
             const elementsArray = Array.isArray(elements) ? elements : [elements];
 
+            // Récupérer toutes les Pages
             const pages: HTMLElement[] = [];
 
             for (const el of elementsArray) {
@@ -61,24 +62,16 @@ export function usePDF() {
                 throw new Error('No pages found to generate PDF');
             }
 
-            const baseFilename = options?.filename?.replace('.pdf', '') || 'document';
-
-            for (let i = 0; i < pages.length; i++) {
-                const pdf = await generator.generatePage(pages[i], {
-                    format: options?.format || config.format,
-                    orientation: options?.orientation || config.orientation,
-                    scale: options?.scale || 1.5,
-                    margin: options?.margin || config.margin,
-                    backgroundColor: options?.backgroundColor || '#ffffff',
-                    quality: options?.quality || 0.8,
-                });
-
-                const filename = pages.length === 1
-                    ? `${baseFilename}.pdf`
-                    : `${baseFilename}_page_${i + 1}.pdf`;
-
-                pdf.save(filename);
-            }
+            // Générer et fusionner les PDFs
+            await generator.downloadMultiplePages(pages, {
+                filename: options?.filename || 'document.pdf',
+                format: options?.format || config.format,
+                orientation: options?.orientation || config.orientation,
+                scale: options?.scale || 1.5,
+                margin: options?.margin || config.margin,
+                backgroundColor: options?.backgroundColor || '#ffffff',
+                quality: options?.quality || 0.8,
+            });
 
             setLoading(false);
         } catch (err) {
