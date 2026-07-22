@@ -1,5 +1,3 @@
-export { PDFGenerator } from './PDFGenerator';
-export type { PDFGeneratorProps } from './PDFGenerator';
 export { Flex } from './Flex';
 export type { FlexProps } from './Flex';
 export { Grid } from './Grid';
@@ -30,3 +28,5 @@ export { Barcode } from './Barcode';
 export type { BarcodeProps } from './Barcode';
 export { Page } from './Page';
 export type { PageProps } from './Page';
+export { PDFPreview } from './PDFPreview';
+export type { PDFPreviewProps } from './PDFPreview'

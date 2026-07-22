@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useState } from 'react';
 import {
     Flex,
     Grid,
@@ -7,9 +7,10 @@ import {
     Heading,
     Divider,
     Page,
-    usePDF,
-    PDFProvider,
+    usePdf,
+    PDFPreview,
 } from '../../src';
+import { Eye, Download, Loader2 } from 'lucide-react';
 
 function BasicDocument() {
     return (
@@ -44,35 +45,9 @@ function BasicDocument() {
     );
 }
 
-function BasicExampleContent() {
-    const [isLoading, setIsLoading] = useState(false);
-    const containerRef = useRef<HTMLDivElement>(null);
-
-    const { download, loading } = usePDF();
-
-    const handleDownload = async () => {
-        setIsLoading(true);
-        try {
-            const container = containerRef.current;
-            if (!container) {
-                throw new Error('Container not found');
-            }
-
-            // ✅ Ancienne API : on passe l'élément HTML en paramètre
-            await download(container, {
-                filename: 'basic-document.pdf',
-                format: 'a4',
-                orientation: 'portrait',
-                scale: 2,
-            });
-        } catch (error) {
-            console.error('Download failed:', error);
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
-    const isLoadingState = loading || isLoading;
+export default function BasicExample() {
+    const [showPreview, setShowPreview] = useState(false);
+    const { download, loading } = usePdf(<BasicDocument />);
 
     return (
         <div className="p-8 bg-background min-h-screen">
@@ -80,38 +55,43 @@ function BasicExampleContent() {
                 Basic PDF Generator
             </h1>
 
-            {/* ✅ Conteneur avec ref pour le download */}
-            <div
-                ref={containerRef}
-                className="border border-border rounded-lg p-4 bg-card mb-4"
-            >
-                <BasicDocument />
-            </div>
-
             <div className="flex gap-3 flex-wrap">
                 <button
-                    onClick={handleDownload}
-                    disabled={isLoadingState}
-                    className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 disabled:bg-muted disabled:text-muted-foreground transition-all duration-200 font-medium"
+                    onClick={() => setShowPreview(true)}
+                    className="inline-flex items-center gap-2 px-4 py-2 bg-muted text-foreground rounded-lg hover:bg-muted/80 transition-all duration-200 font-medium"
                 >
-                    {isLoadingState ? (
+                    <Eye size={18} />
+                    Preview
+                </button>
+
+                <button
+                    onClick={() => download({ filename: 'basic-document.pdf' })}
+                    disabled={loading}
+                    className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 disabled:bg-muted disabled:text-muted-foreground transition-all duration-200 font-medium"
+                >
+                    {loading ? (
                         <>
-                            <span className="inline-block animate-spin mr-2">⏳</span>
+                            <Loader2 size={18} className="animate-spin" />
                             Generating...
                         </>
                     ) : (
-                        '⬇️ Download PDF'
+                        <>
+                            <Download size={18} />
+                            Download PDF
+                        </>
                     )}
                 </button>
             </div>
-        </div>
-    );
-}
 
-export default function BasicExample() {
-    return (
-        <PDFProvider>
-            <BasicExampleContent />
-        </PDFProvider>
+            {showPreview && (
+                <PDFPreview
+                    width={60}
+                    height={60}
+                    onClose={() => setShowPreview(false)}
+                >
+                    <BasicDocument />
+                </PDFPreview>
+            )}
+        </div>
     );
 }

@@ -1,7 +1,7 @@
+// src/utils/pdfGenerator.ts
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 import { PDFDocument } from 'pdf-lib';
-
 
 export interface PDFOptions {
     filename?: string;
@@ -11,10 +11,94 @@ export interface PDFOptions {
     format?: 'a4' | 'a3' | 'letter' | 'legal' | number[];
     orientation?: 'portrait' | 'landscape';
     quality?: number; // 0.1 à 1.0
+    /** Largeur du conteneur de rendu (défaut: 900) */
+    containerWidth?: number;
+    /** Padding du conteneur de rendu (défaut: 40) */
+    containerPadding?: number;
+    /** Couleur de fond du conteneur de rendu (défaut: #ffffff) */
+    containerBackground?: string;
 }
 
 export class PDFGenerator {
+    /**
+     * Crée un conteneur temporaire caché pour le rendu
+     */
+    private createTempContainer(
+        content: HTMLElement | string,
+        options: {
+            width?: number;
+            padding?: number;
+            background?: string;
+        } = {}
+    ): HTMLDivElement {
+        const {
+            width = 900,
+            padding = 40,
+            background = '#ffffff',
+        } = options;
 
+        const container = document.createElement('div');
+        container.style.position = 'absolute';
+        container.style.left = '-9999px';
+        container.style.top = '0';
+        container.style.width = `${width}px`;
+        container.style.background = background;
+        container.style.padding = `${padding}px`;
+
+        if (typeof content === 'string') {
+            container.innerHTML = content;
+        } else {
+            container.appendChild(content.cloneNode(true));
+        }
+
+        document.body.appendChild(container);
+        return container;
+    }
+
+    /**
+     * Nettoie et supprime un conteneur du DOM
+     */
+    private removeTempContainer(container: HTMLDivElement): void {
+        if (container.parentNode) {
+            document.body.removeChild(container);
+        }
+    }
+
+    /**
+     * Capture un élément HTML en canvas
+     */
+    private async captureElement(
+        element: HTMLElement,
+        options: {
+            scale: number;
+            backgroundColor: string;
+            width: number;
+            height: number;
+        }
+    ): Promise<HTMLCanvasElement> {
+        return html2canvas(element, {
+            scale: options.scale,
+            backgroundColor: options.backgroundColor,
+            logging: false,
+            useCORS: true,
+            allowTaint: true,
+            width: options.width,
+            height: options.height,
+            windowWidth: options.width,
+            windowHeight: options.height,
+        });
+    }
+
+    /**
+     * Attend que le conteneur soit prêt
+     */
+    private wait(ms: number): Promise<void> {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    /**
+     * Génère une page PDF à partir d'un élément HTML
+     */
     async generatePage(
         element: HTMLElement,
         options: PDFOptions = {}
@@ -25,35 +109,29 @@ export class PDFGenerator {
             margin = 10,
             format = 'a4',
             orientation = 'portrait',
-            quality = 0.8
+            quality = 0.8,
+            containerWidth = 900,
+            containerPadding = 40,
+            containerBackground = '#ffffff',
         } = options;
 
-        const tempContainer = document.createElement('div');
-        tempContainer.style.position = 'absolute';
-        tempContainer.style.left = '-9999px';
-        tempContainer.style.top = '0';
-        tempContainer.style.width = '794px';
-        tempContainer.style.background = '#ffffff';
-        tempContainer.style.padding = '40px';
-        tempContainer.appendChild(element.cloneNode(true));
-        document.body.appendChild(tempContainer);
+        const container = this.createTempContainer(element, {
+            width: containerWidth,
+            padding: containerPadding,
+            background: containerBackground,
+        });
 
         try {
-            await new Promise(resolve => setTimeout(resolve, 200));
+            await this.wait(200);
 
-            const canvas = await html2canvas(tempContainer, {
-                scale: scale,
-                backgroundColor: backgroundColor,
-                logging: false,
-                useCORS: true,
-                allowTaint: true,
-                width: 794,
-                height: tempContainer.scrollHeight,
-                windowWidth: 794,
-                windowHeight: tempContainer.scrollHeight,
+            const canvas = await this.captureElement(container, {
+                scale,
+                backgroundColor,
+                width: containerWidth,
+                height: container.scrollHeight,
             });
 
-            document.body.removeChild(tempContainer);
+            this.removeTempContainer(container);
 
             const pdf = new jsPDF({
                 orientation: orientation,
@@ -84,11 +162,14 @@ export class PDFGenerator {
             return pdf.output('arraybuffer');
 
         } catch (error) {
-            document.body.removeChild(tempContainer);
+            this.removeTempContainer(container);
             throw new Error(`PDF generation failed: ${error}`);
         }
     }
 
+    /**
+     * Génère un PDF multi-pages
+     */
     async generateMultiplePages(
         elements: HTMLElement[],
         options: PDFOptions = {}
@@ -99,7 +180,10 @@ export class PDFGenerator {
             scale = 1.5,
             margin = 10,
             backgroundColor = '#ffffff',
-            quality = 0.8
+            quality = 0.8,
+            containerWidth = 900,
+            containerPadding = 40,
+            containerBackground = '#ffffff',
         } = options;
 
         const pdfBuffers: ArrayBuffer[] = [];
@@ -112,6 +196,9 @@ export class PDFGenerator {
                 margin,
                 backgroundColor,
                 quality,
+                containerWidth,
+                containerPadding,
+                containerBackground,
             });
             pdfBuffers.push(buffer);
         }
@@ -123,6 +210,9 @@ export class PDFGenerator {
         return await this.mergePDFs(pdfBuffers);
     }
 
+    /**
+     * Fusionne plusieurs PDFs
+     */
     async mergePDFs(pdfFiles: ArrayBuffer[]): Promise<ArrayBuffer> {
         try {
             const mergedPdf = await PDFDocument.create();
@@ -140,6 +230,9 @@ export class PDFGenerator {
         }
     }
 
+    /**
+     * Convertit du HTML en base64
+     */
     async toBase64(
         htmlContent: string,
         options: PDFOptions = {}
@@ -147,42 +240,39 @@ export class PDFGenerator {
         const {
             scale = 1.5,
             backgroundColor = '#ffffff',
-            quality = 0.8
+            quality = 0.8,
+            containerWidth = 900,
+            containerPadding = 40,
+            containerBackground = '#ffffff',
         } = options;
 
-        const container = document.createElement('div');
-        container.innerHTML = htmlContent;
-        container.style.position = 'absolute';
-        container.style.left = '-9999px';
-        container.style.top = '0';
-        container.style.width = '794px';
-        container.style.background = '#ffffff';
-        container.style.padding = '40px';
-        document.body.appendChild(container);
+        const container = this.createTempContainer(htmlContent, {
+            width: containerWidth,
+            padding: containerPadding,
+            background: containerBackground,
+        });
 
         try {
-            await new Promise(resolve => setTimeout(resolve, 300));
+            await this.wait(300);
 
-            const canvas = await html2canvas(container, {
-                scale: scale,
-                backgroundColor: backgroundColor,
-                logging: false,
-                useCORS: true,
-                allowTaint: true,
-                width: 794,
+            const canvas = await this.captureElement(container, {
+                scale,
+                backgroundColor,
+                width: containerWidth,
                 height: container.scrollHeight,
-                windowWidth: 794,
-                windowHeight: container.scrollHeight,
             });
 
-            document.body.removeChild(container);
+            this.removeTempContainer(container);
             return canvas.toDataURL('image/jpeg', quality);
         } catch (error) {
-            document.body.removeChild(container);
+            this.removeTempContainer(container);
             throw new Error(`Base64 conversion failed: ${error}`);
         }
     }
 
+    /**
+     * Télécharge directement un PDF multi-pages
+     */
     async downloadMultiplePages(
         elements: HTMLElement[],
         options: PDFOptions = {}

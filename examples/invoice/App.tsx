@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useState } from 'react';
 import {
     Flex,
     Grid,
@@ -12,9 +12,10 @@ import {
     QRCode,
     Barcode,
     Page,
-    usePDF,
-    PDFProvider,
+    usePdf,
+    PDFPreview,
 } from '../../src';
+import { Eye, Download, Loader2 } from 'lucide-react';
 
 function InvoiceDocument() {
     const items = [
@@ -240,35 +241,9 @@ function InvoiceDocument() {
     );
 }
 
-function InvoiceExampleContent() {
-    const [isLoading, setIsLoading] = useState(false);
-    const containerRef = useRef<HTMLDivElement>(null);
-
-    const { download, loading } = usePDF();
-
-    const handleDownload = async () => {
-        setIsLoading(true);
-        try {
-            const container = containerRef.current;
-            if (!container) {
-                throw new Error('Container not found');
-            }
-
-            // ✅ Ancienne API : on passe l'élément HTML en paramètre
-            await download(container, {
-                filename: 'invoice_INV-2026-001.pdf',
-                format: 'a4',
-                orientation: 'portrait',
-                scale: 2,
-            });
-        } catch (error) {
-            console.error('Download failed:', error);
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
-    const isLoadingState = loading || isLoading;
+export default function InvoiceExample() {
+    const [showPreview, setShowPreview] = useState(false);
+    const { download, loading } = usePdf(<InvoiceDocument />);
 
     return (
         <div className="p-8 bg-background min-h-screen" style={{ maxWidth: '1200px', margin: '0 auto' }}>
@@ -276,38 +251,48 @@ function InvoiceExampleContent() {
                 Invoice Generator
             </h1>
 
-            {/* ✅ Conteneur avec ref pour le download */}
-            <div
-                ref={containerRef}
-                className="border border-border rounded-lg p-4 bg-card mb-4"
-            >
-                <InvoiceDocument />
-            </div>
-
             <div className="flex gap-3 flex-wrap">
                 <button
-                    onClick={handleDownload}
-                    disabled={isLoadingState}
-                    className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 disabled:bg-muted disabled:text-muted-foreground transition-all duration-200 font-medium"
+                    onClick={() => setShowPreview(true)}
+                    className="inline-flex items-center gap-2 px-4 py-2 bg-muted text-foreground rounded-lg hover:bg-muted/80 transition-all duration-200 font-medium"
                 >
-                    {isLoadingState ? (
+                    <Eye size={18} />
+                    Preview
+                </button>
+
+                <button
+                    onClick={() => download({
+                        filename: 'invoice_INV-2026-001.pdf',
+                        containerWidth: 900,
+                        containerPadding: 40,
+                        containerBackground: '#ffffff',
+                    })}
+                    disabled={loading}
+                    className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 disabled:bg-muted disabled:text-muted-foreground transition-all duration-200 font-medium"
+                >
+                    {loading ? (
                         <>
-                            <span className="inline-block animate-spin mr-2">⏳</span>
+                            <Loader2 size={18} className="animate-spin" />
                             Generating...
                         </>
                     ) : (
-                        '⬇️ Download Invoice PDF'
+                        <>
+                            <Download size={18} />
+                            Download Invoice PDF
+                        </>
                     )}
                 </button>
             </div>
-        </div>
-    );
-}
 
-export default function InvoiceExample() {
-    return (
-        <PDFProvider>
-            <InvoiceExampleContent />
-        </PDFProvider>
+            {showPreview && (
+                <PDFPreview
+                    width={90}
+                    height={85}
+                    onClose={() => setShowPreview(false)}
+                >
+                    <InvoiceDocument />
+                </PDFPreview>
+            )}
+        </div>
     );
 }

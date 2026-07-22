@@ -1,6 +1,5 @@
 import './styles/tailwind.css';
 
-export { PDFGenerator } from './components/PDFGenerator';
 export { Flex } from './components/Flex';
 export { Grid } from './components/Grid';
 export { Box } from './components/Box';
@@ -17,7 +16,8 @@ export { QRCode } from './components/QRCode';
 export { Barcode } from './components/Barcode';
 export { Page } from './components/Page';
 
-export { usePDF } from './hooks/usePDF';
+export { usePdf } from './hooks/usePdf';
 export { PDFProvider, usePDFContext } from './context';
 
 export * from './types';
+export * from './components'
