@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>React PDF Builder - Examples</title>
+    <script type="importmap">
+    {
+      "imports": {
+        "react": "https://cdn.jsdelivr.net/npm/react@18.2.0/umd/react.production.min.js",
+        "react-dom/client": "https://cdn.jsdelivr.net/npm/react-dom@18.2.0/umd/react-dom.production.min.js",
+        "react-pdf-builder": "../src/index.ts"
+      }
+    }
+    </script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f0f2f5;
+        }
+
+        .navbar {
+            padding: 20px;
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            background: #ffffff;
+            border-bottom: 1px solid #e5e7eb;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .navbar button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+
+        .navbar button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .navbar button:active {
+            transform: translateY(0);
+        }
+
+        #btnBasic {
+            background: #4338ca;
+            color: white;
+        }
+
+        #btnBasic:hover {
+            background: #3730a3;
+        }
+
+        #btnInvoice {
+            background: #059669;
+            color: white;
+        }
+
+        #btnInvoice:hover {
+            background: #047857;
+        }
+
+        #root {
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .preview-container {
+            margin-bottom: 20px;
+            min-height: 200px;
+            border: 2px dashed #d1d5db;
+            border-radius: 8px;
+            padding: 10px;
+            background: #f9fafb;
+            transition: all 0.3s;
+        }
+
+        .preview-container.has-content {
+            border-color: #4338ca;
+            background: #ffffff;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="navbar">
+        <button id="btnBasic">📄 Basic Example</button>
+        <button id="btnInvoice">🧾 Invoice Example</button>
+    </div>
+    <div id="root"></div>
+
+    <script type="module">
+        import React from 'react';
+        import ReactDOM from 'react-dom/client';
+        import BasicExample from './basic/App.tsx';
+        import InvoiceExample from './invoice/App.tsx';
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+
+        // Charger Basic par défaut
+        root.render(React.createElement(BasicExample));
+
+        // Gestion des boutons
+        document.getElementById('btnBasic').addEventListener('click', () => {
+            root.render(React.createElement(BasicExample));
+        });
+
+        document.getElementById('btnInvoice').addEventListener('click', () => {
+            root.render(React.createElement(InvoiceExample));
+        });
+    </script>
+</body>
+
+</html>

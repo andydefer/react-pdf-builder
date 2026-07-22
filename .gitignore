@@ -32,5 +32,4 @@ yarn-error.log*
 # Temp
 temp/
 *.tmpdist/
-examples/
 docs/diffs/
