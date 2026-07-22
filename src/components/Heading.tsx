@@ -30,7 +30,7 @@ export function Heading({
         muted: 'text-gray-500',
     }[color];
 
-    const Tag = `h${level}` as keyof JSX.IntrinsicElements;
+    const Tag = `h${level}` as keyof React.JSX.IntrinsicElements;
 
     return React.createElement(
         Tag,

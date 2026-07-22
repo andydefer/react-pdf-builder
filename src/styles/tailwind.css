@@ -2,6 +2,32 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ============ FONTS ============ */
+@font-face {
+    font-family: 'Sofia';
+    src: url('./fonts/sofia/SofiaSans-Regular.woff2') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Sofia';
+    src: url('./fonts/sofia/SofiaSans-Italic.woff2') format('woff2');
+    font-weight: 400;
+    font-style: italic;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Sofia';
+    src: url('./fonts/sofia/SofiaSans-Bold.woff2') format('woff2');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
+
+
 @layer base {
     * {
         margin: 0;
@@ -27,5 +53,173 @@
 
     .pdf-footer {
         @apply mt-8 pt-6 border-t-2 border-gray-100 text-sm text-gray-400;
+    }
+
+    .text-primary {
+        color: hsl(var(--primary));
+    }
+
+    .text-secondary {
+        color: hsl(var(--secondary));
+    }
+
+    .text-muted {
+        color: hsl(var(--muted-foreground));
+    }
+
+    .text-danger {
+        color: hsl(var(--destructive));
+    }
+
+    .text-success {
+        color: hsl(var(--success));
+    }
+
+    .text-warning {
+        color: hsl(var(--warning));
+    }
+
+    .bg-primary {
+        background-color: hsl(var(--primary));
+    }
+
+    .bg-secondary {
+        background-color: hsl(var(--secondary));
+    }
+
+    .bg-muted {
+        background-color: hsl(var(--muted));
+    }
+
+    .border-primary {
+        border-color: hsl(var(--primary));
+    }
+
+    .border-muted {
+        border-color: hsl(var(--border));
+    }
+}
+
+
+/* ============ FONTS ============ */
+@font-face {
+    font-family: 'Sofia';
+    src: url('./fonts/sofia/SofiaSans-Regular.woff2') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Sofia';
+    src: url('./fonts/sofia/SofiaSans-Italic.woff2') format('woff2');
+    font-weight: 400;
+    font-style: italic;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Sofia';
+    src: url('./fonts/sofia/SofiaSans-Bold.woff2') format('woff2');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* ============ BASE STYLES ============ */
+@layer base {
+    :root {
+        /* Couleurs principales */
+        --background: 0 0% 100%;
+        --foreground: 220 30% 12%;
+        --card: 0 0% 100%;
+        --card-foreground: 220 30% 12%;
+        --primary: 210 95% 45%;
+        --primary-foreground: 0 0% 100%;
+        --secondary: 215 90% 50%;
+        --secondary-foreground: 0 0% 100%;
+        --accent: 205 85% 50%;
+        --accent-foreground: 0 0% 100%;
+        --destructive: 5 85% 52%;
+        --destructive-foreground: 0 0% 100%;
+        --success: 160 65% 45%;
+        --success-foreground: 0 0% 100%;
+        --warning: 40 95% 55%;
+        --warning-foreground: 0 0% 100%;
+        --muted: 210 25% 96%;
+        --muted-foreground: 220 20% 40%;
+        --border: 210 25% 80%;
+        --input: 210 25% 96%;
+        --ring: 210 95% 45%;
+        --popover: 0 0% 100%;
+        --popover-foreground: 220 30% 12%;
+
+        /* Espacements */
+        --radius-sm: 0.375rem;
+        --radius: 0.5rem;
+        --radius-lg: 0.75rem;
+        --radius-xl: 1rem;
+
+        /* Polices */
+        --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+        --font-serif: 'Georgia', serif;
+        --font-mono: 'Courier New', monospace;
+    }
+
+    /* Thème clair */
+    .light {
+        --background: 0 0% 100%;
+        --foreground: 253 20% 10%;
+        --card: 0 0% 100%;
+        --card-foreground: 253 20% 10%;
+        --popover: 0 0% 100%;
+        --popover-foreground: 253 20% 10%;
+        --primary: 270 95% 60%;
+        --primary-foreground: 270 100% 98%;
+        --secondary: 270 40% 96%;
+        --secondary-foreground: 253 20% 15%;
+        --muted: 270 40% 94%;
+        --muted-foreground: 270 15% 40%;
+        --accent: 275 70% 80%;
+        --accent-foreground: 253 20% 20%;
+        --destructive: 0 85% 60%;
+        --destructive-foreground: 0 0% 98%;
+        --border: 270 40% 85%;
+        --input: 270 40% 85%;
+        --ring: 270 95% 60%;
+    }
+
+    /* Thème sombre */
+    .dark {
+        --background: 258 20% 10%;
+        --foreground: 270 100% 98%;
+        --card: 258 20% 12%;
+        --card-foreground: 270 100% 98%;
+        --popover: 258 20% 12%;
+        --popover-foreground: 270 100% 98%;
+        --primary: 270 95% 70%;
+        --primary-foreground: 270 30% 15%;
+        --secondary: 270 30% 25%;
+        --secondary-foreground: 270 100% 98%;
+        --muted: 270 20% 20%;
+        --muted-foreground: 270 10% 70%;
+        --accent: 275 70% 70%;
+        --accent-foreground: 270 100% 10%;
+        --destructive: 0 60% 45%;
+        --destructive-foreground: 0 0% 98%;
+        --border: 270 20% 30%;
+        --input: 270 20% 30%;
+        --ring: 270 95% 60%;
+    }
+
+    body {
+        @apply font-sans antialiased;
+        background: hsl(var(--background));
+        color: hsl(var(--foreground));
+    }
+
+    img {
+        max-width: 100%;
+        height: auto;
     }
 }

@@ -1,6 +1,5 @@
 import { usePDFContext } from '../context';
-import { PDFOptions } from '../types/pdf';
-import { PDFGenerator as PDFGeneratorClass } from '../utils/pdfGenerator';
+import { PDFGenerator as PDFGeneratorClass, PDFOptions } from '../utils/pdfGenerator';
 
 export function usePDF() {
     const { config, setConfig, loading, setLoading, error, setError } = usePDFContext();
