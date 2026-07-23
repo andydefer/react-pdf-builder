@@ -3,7 +3,7 @@
 > Générez des documents PDF professionnels avec React et Tailwind CSS
 
 [![npm version](https://img.shields.io/badge/npm-1.0.0-blue.svg)](https://www.npmjs.com/package/@andy-defer/react-pdf-builder)
-[![license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/andy-defer/react-pdf-builder/blob/main/LICENSE)
+[![license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/andydefer/react-pdf-builder/blob/main/LICENSE)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-blue.svg)](https://www.typescriptlang.org/)
 [![React](https://img.shields.io/badge/React-18.0+-blue.svg)](https://reactjs.org/)
 
@@ -1224,6 +1224,6 @@ Ce projet est sous licence **MIT**. Voir le fichier [LICENSE](LICENSE) pour plus
 
 ## Liens utiles
 
-- [GitHub Repository](https://github.com/andy-defer/react-pdf-builder)
+- [GitHub Repository](https://github.com/andydefer/react-pdf-builder)
 - [NPM Package](https://www.npmjs.com/package/@andy-defer/react-pdf-builder)
-- [Signaler un bug](https://github.com/andy-defer/react-pdf-builder/issues)
+- [Signaler un bug](https://github.com/andydefer/react-pdf-builder/issues)
