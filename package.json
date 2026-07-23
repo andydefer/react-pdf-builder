@@ -76,15 +76,15 @@
     ],
     "author": {
         "name": "Andy Defer",
-        "email": "andy@defer.dev",
-        "url": "https://github.com/andy-defer"
+        "email": "andykanidimbu@gmail.com",
+        "url": "https://github.com/andydefer"
     },
     "repository": {
         "type": "git",
-        "url": "https://github.com/andy-defer/react-pdf-builder.git"
+        "url": "https://github.com/andydefer/react-pdf-builder.git"
     },
     "bugs": {
-        "url": "https://github.com/andy-defer/react-pdf-builder/issues"
+        "url": "https://github.com/andydefer/react-pdf-builder/issues"
     },
-    "homepage": "https://github.com/andy-defer/react-pdf-builder#readme"
+    "homepage": "https://github.com/andydefer/react-pdf-builder#readme"
 }
